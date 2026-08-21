@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="QrOverlayScanner.Views.MainWindow"
+        x:CompileBindings="False"
+        Title="Avalonia QR Overlay Scanner"
+        Width="660"
+        Height="240"
+        MinWidth="520"
+        MinHeight="200"
+        WindowStartupLocation="CenterScreen">
+  <Grid Margin="28" RowDefinitions="Auto,Auto,*" RowSpacing="14">
+    <TextBlock FontSize="22" FontWeight="SemiBold" Text="屏幕二维码扫描" />
+
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="12">
+      <Button x:Name="ScanButton"
+              MinWidth="128"
+              Content="打开扫描窗口"
+              Click="ScanButton_OnClick" />
+      <TextBlock VerticalAlignment="Center"
+                 Foreground="Gray"
+                 Text="拖动透明窗口覆盖二维码区域" />
+    </StackPanel>
+
+    <TextBox x:Name="ResultTextBox"
+             Grid.Row="2"
+             MinHeight="72"
+             AcceptsReturn="True"
+             TextWrapping="Wrap"
+             PlaceholderText="扫描结果会显示在这里" />
+  </Grid>
+</Window>

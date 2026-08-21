@@ -1,0 +1,325 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="QrOverlayScanner.Views.ScannerWindow"
+        x:CompileBindings="False"
+        Title="扫一扫"
+        Width="900"
+        Height="700"
+        MinWidth="620"
+        MinHeight="520"
+        WindowStartupLocation="CenterOwner"
+        WindowDecorations="None"
+        CanResize="True"
+        CanMinimize="False"
+        CanMaximize="True"
+        Topmost="True"
+        ShowInTaskbar="False"
+        TransparencyLevelHint="Transparent"
+        Background="{x:Null}">
+
+  <Window.Styles>
+    <Style Selector="Button.chrome-button">
+      <Setter Property="Width" Value="34" />
+      <Setter Property="Height" Value="34" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="CornerRadius" Value="17" />
+      <Setter Property="Background" Value="#16FFFFFF" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.chrome-button:pointerover">
+      <Setter Property="Background" Value="#2AFFFFFF" />
+    </Style>
+    <Style Selector="Button.chrome-button:pressed">
+      <Setter Property="Background" Value="#3AFFFFFF" />
+    </Style>
+
+    <Style Selector="Button.viewport-button">
+      <Setter Property="Height" Value="32" />
+      <Setter Property="MinWidth" Value="36" />
+      <Setter Property="Padding" Value="10,0" />
+      <Setter Property="CornerRadius" Value="16" />
+      <Setter Property="Background" Value="#18FFFFFF" />
+      <Setter Property="BorderBrush" Value="#28FFFFFF" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Foreground" Value="#F2FFFFFF" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.viewport-button:pointerover">
+      <Setter Property="Background" Value="#2CFFFFFF" />
+      <Setter Property="BorderBrush" Value="#40FFFFFF" />
+    </Style>
+    <Style Selector="Button.viewport-button:pressed">
+      <Setter Property="Background" Value="#3CFFFFFF" />
+    </Style>
+  </Window.Styles>
+
+  <Border BorderThickness="5"
+          BorderBrush="#EA151816"
+          CornerRadius="18"
+          Background="{x:Null}">
+    <Border CornerRadius="13"
+            ClipToBounds="True"
+            BoxShadow="0 12 40 0 #99000000">
+      <Grid RowDefinitions="54,*">
+        <Border Grid.Row="0"
+                Background="#F0131614"
+                PointerPressed="TitleBar_OnPointerPressed">
+          <Grid ColumnDefinitions="48,*,42,42" Margin="10,0">
+            <Border Width="30"
+                    Height="30"
+                    CornerRadius="15"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="#1607C160"
+                    BorderBrush="#5207C160"
+                    BorderThickness="1">
+              <Path Width="16"
+                    Height="16"
+                    Stretch="Uniform"
+                    Fill="#FF07C160"
+                    Data="M2,2 L7,2 L7,4 L4,4 L4,7 L2,7 Z M9,2 L14,2 L14,7 L12,7 L12,4 L9,4 Z M2,9 L4,9 L4,12 L7,12 L7,14 L2,14 Z M10,9 L12,9 L12,11 L14,11 L14,14 L9,14 L9,12 L10,12 Z" />
+            </Border>
+
+            <StackPanel Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Spacing="1">
+              <TextBlock HorizontalAlignment="Center"
+                         Foreground="White"
+                         FontSize="16"
+                         FontWeight="SemiBold"
+                         Text="扫一扫" />
+              <TextBlock HorizontalAlignment="Center"
+                         Foreground="#8FFFFFFF"
+                         FontSize="10"
+                         Text="QR CODE SCANNER" />
+            </StackPanel>
+
+            <Button Grid.Column="2"
+                    Classes="chrome-button"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Click="MaximizeButton_OnClick">
+              <Path Width="13"
+                    Height="13"
+                    Stretch="Uniform"
+                    Stroke="White"
+                    StrokeThickness="1.5"
+                    Data="M1.5,1.5 L11.5,1.5 L11.5,11.5 L1.5,11.5 Z" />
+            </Button>
+
+            <Button Grid.Column="3"
+                    Classes="chrome-button"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Click="CloseButton_OnClick">
+              <Path Width="12"
+                    Height="12"
+                    Stretch="Uniform"
+                    Stroke="White"
+                    StrokeThickness="1.8"
+                    Data="M1,1 L11,11 M11,1 L1,11" />
+            </Button>
+          </Grid>
+        </Border>
+
+        <Grid x:Name="ScanSurface"
+              Grid.Row="1"
+              RowDefinitions="*,Auto"
+              Background="{x:Null}">
+          <!-- This row contains only the transparent capture viewport and masks. -->
+          <Grid x:Name="ScanViewportHost"
+                Grid.Row="0"
+                Background="Transparent"
+                PointerWheelChanged="ScanSurface_OnPointerWheelChanged">
+            <Grid RowDefinitions="*,Auto,*"
+                  ColumnDefinitions="*,Auto,*">
+              <Border Grid.Row="0"
+                      Grid.ColumnSpan="3"
+                      Background="#A6000000"
+                      IsHitTestVisible="False" />
+              <Border Grid.Row="1"
+                      Grid.Column="0"
+                      Background="#A6000000"
+                      IsHitTestVisible="False" />
+              <Border Grid.Row="1"
+                      Grid.Column="2"
+                      Background="#A6000000"
+                      IsHitTestVisible="False" />
+              <Border Grid.Row="2"
+                      Grid.ColumnSpan="3"
+                      Background="#A6000000"
+                      IsHitTestVisible="False" />
+
+              <!-- Only this transparent square is captured and decoded. -->
+              <Grid x:Name="ScanViewport"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Width="500"
+                    Height="500"
+                    Background="{x:Null}"
+                    ClipToBounds="False">
+                <Border BorderBrush="#38FFFFFF"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        IsHitTestVisible="False" />
+
+                <Grid IsHitTestVisible="False">
+                  <Border Width="38" Height="4" Margin="-1,-1,0,0"
+                          HorizontalAlignment="Left" VerticalAlignment="Top"
+                          Background="#FF07C160" CornerRadius="2" />
+                  <Border Width="4" Height="38" Margin="-1,-1,0,0"
+                          HorizontalAlignment="Left" VerticalAlignment="Top"
+                          Background="#FF07C160" CornerRadius="2" />
+
+                  <Border Width="38" Height="4" Margin="0,-1,-1,0"
+                          HorizontalAlignment="Right" VerticalAlignment="Top"
+                          Background="#FF07C160" CornerRadius="2" />
+                  <Border Width="4" Height="38" Margin="0,-1,-1,0"
+                          HorizontalAlignment="Right" VerticalAlignment="Top"
+                          Background="#FF07C160" CornerRadius="2" />
+
+                  <Border Width="38" Height="4" Margin="-1,0,0,-1"
+                          HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                          Background="#FF07C160" CornerRadius="2" />
+                  <Border Width="4" Height="38" Margin="-1,0,0,-1"
+                          HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                          Background="#FF07C160" CornerRadius="2" />
+
+                  <Border Width="38" Height="4" Margin="0,0,-1,-1"
+                          HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                          Background="#FF07C160" CornerRadius="2" />
+                  <Border Width="4" Height="38" Margin="0,0,-1,-1"
+                          HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                          Background="#FF07C160" CornerRadius="2" />
+                </Grid>
+
+                <Border x:Name="ScanLine"
+                        Height="2"
+                        Margin="18,0"
+                        VerticalAlignment="Top"
+                        CornerRadius="1"
+                        Opacity="0.95"
+                        BoxShadow="0 0 10 2 #7007C160"
+                        IsHitTestVisible="False">
+                  <Border.Background>
+                    <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%">
+                      <GradientStop Offset="0" Color="#0007C160" />
+                      <GradientStop Offset="0.18" Color="#8807C160" />
+                      <GradientStop Offset="0.5" Color="#FF57E389" />
+                      <GradientStop Offset="0.82" Color="#8807C160" />
+                      <GradientStop Offset="1" Color="#0007C160" />
+                    </LinearGradientBrush>
+                  </Border.Background>
+                </Border>
+
+                <Canvas x:Name="LockBoxLayer"
+                        Background="{x:Null}"
+                        IsHitTestVisible="False" />
+
+                <Canvas x:Name="ConfirmButtonLayer"
+                        Background="{x:Null}" />
+              </Grid>
+            </Grid>
+          </Grid>
+
+          <!-- Controls stay outside the capture rectangle, including on X11. -->
+          <Border Grid.Row="1"
+                  Padding="18,10,18,11"
+                  Background="#F0131614"
+                  BorderBrush="#24FFFFFF"
+                  BorderThickness="0,1,0,0">
+            <Grid RowDefinitions="Auto,Auto"
+                  ColumnDefinitions="*,Auto">
+              <Border Grid.Row="0"
+                      Grid.Column="0"
+                      Margin="0,0,14,0"
+                      Padding="14,7"
+                      CornerRadius="17"
+                      Background="#B9161917"
+                      BorderBrush="#20FFFFFF"
+                      BorderThickness="1">
+                <TextBlock x:Name="StatusText"
+                           HorizontalAlignment="Center"
+                           TextAlignment="Center"
+                           TextWrapping="Wrap"
+                           TextTrimming="CharacterEllipsis"
+                           Foreground="#F2FFFFFF"
+                           FontSize="13"
+                           Text="将取景框覆盖完整二维码" />
+              </Border>
+
+              <StackPanel Grid.Row="0"
+                          Grid.Column="1"
+                          Orientation="Horizontal"
+                          VerticalAlignment="Center"
+                          Spacing="7">
+                <TextBlock Margin="0,0,2,0"
+                           VerticalAlignment="Center"
+                           Foreground="#A8FFFFFF"
+                           FontSize="12"
+                           Text="取景框" />
+                <Button Classes="viewport-button"
+                        FontSize="19"
+                        Content="−"
+                        Click="ShrinkViewportButton_OnClick" />
+                <Border Height="32"
+                        MinWidth="56"
+                        Padding="10,0"
+                        CornerRadius="16"
+                        Background="#0F07C160"
+                        BorderBrush="#4807C160"
+                        BorderThickness="1">
+                  <TextBlock x:Name="ViewportScaleText"
+                             VerticalAlignment="Center"
+                             HorizontalAlignment="Center"
+                             Foreground="#FF57E389"
+                             FontSize="12"
+                             FontWeight="SemiBold"
+                             Text="90%" />
+                </Border>
+                <Button Classes="viewport-button"
+                        FontSize="18"
+                        Content="+"
+                        Click="ExpandViewportButton_OnClick" />
+                <Button Classes="viewport-button"
+                        Content="最大"
+                        Click="FitViewportButton_OnClick" />
+              </StackPanel>
+
+              <TextBlock Grid.Row="1"
+                         Grid.ColumnSpan="2"
+                         Margin="4,7,4,0"
+                         HorizontalAlignment="Center"
+                         Foreground="#72FFFFFF"
+                         FontSize="11"
+                         Text="滚动鼠标滚轮也可调整取景框 · 窗口最大化后可扫描更大的二维码" />
+            </Grid>
+          </Border>
+
+          <Border Grid.RowSpan="2"
+                  Width="24"
+                  Height="24"
+                  Margin="0,0,3,3"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Bottom"
+                  Background="Transparent"
+                  Cursor="BottomRightCorner"
+                  PointerPressed="ResizeGrip_OnPointerPressed">
+            <Path Width="12"
+                  Height="12"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Stroke="#78FFFFFF"
+                  StrokeThickness="1.4"
+                  Data="M3,11 L11,3 M7,11 L11,7" />
+          </Border>
+        </Grid>
+      </Grid>
+    </Border>
+  </Border>
+</Window>
